@@ -38,8 +38,8 @@ try
     response.EnsureSuccessStatusCode();
 
     // the transactions is a fairly large data structure (see https://docs.nofrixion.com/reference/get_api-v1-accounts-accountid-transactions)
-    // rather than create a large class in this example, we have used NewtonSoft Json to create dynamic object from string ( as .Net's 
-    // ReadFromJsonAsync method doesn't correctly deserialize to <dynamic>
+    // rather than create a large class in this example, we have used NewtonSoft Json to create dynamic object from string (note, .Net's 
+    // ReadFromJsonAsync method doesn't correctly deserialize to <dynamic>)
     
     string transStr = await response.Content.ReadAsStringAsync();
     dynamic transObj = JObject.Parse(transStr);
