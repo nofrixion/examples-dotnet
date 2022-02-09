@@ -10,7 +10,7 @@
 //    set NOFRIXION_SANDBOX_TOKEN=<JWT token from previous step>
 // 3. Run the applicatio using:
 //    dotnet run
-// 4. If successful a list of your transactions will be displayed.
+// 4. If successful a list of your transactions and some metadata will be displayed.
 //-----------------------------------------------------------------------------
 
 using System.Net.Http;
@@ -43,7 +43,7 @@ try
     
     string transStr = await response.Content.ReadAsStringAsync();
     dynamic transObj = JObject.Parse(transStr);
-    // the returned JSON contains an "transactions" property which is an array of transaction details
+    // the returned JSON contains a "transactions" property which is an array of transaction details
     Console.WriteLine(transObj.transactions);
     // and also some summary fields such as the page number and total number of page and transactions
     Console.WriteLine($"Showing page {transObj.page + 1} of {transObj.totalPages + 1}. {transObj.totalSize} transactions in total.");
