@@ -32,7 +32,7 @@ try
     var response = await client.GetAsync($"{SANDBOX_PAYOUTS_URL}/getbyid/{payoutId}");
     response.EnsureSuccessStatusCode();
 
-    // returns a list of payouts
+    // returns requested payout
     Payout payout = await response.Content.ReadFromJsonAsync<Payout>();
 
     // displays data in the payout
