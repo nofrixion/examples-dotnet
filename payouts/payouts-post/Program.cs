@@ -15,14 +15,14 @@
 using System.Net.Http;
 
 //Remember to keep the JWT token safe and secure.
-string jwtToken = Environment.GetEnvironmentVariable("NOFRIXION_SANDBOX_TOKEN");
+var jwtToken = Environment.GetEnvironmentVariable("NOFRIXION_SANDBOX_TOKEN");
 
 var client = new HttpClient();
 
 client.DefaultRequestHeaders.Add("Accept", "text/plain");
 client.DefaultRequestHeaders.Add("Authorization", $"Bearer {jwtToken}");
 
-string url = "https://api-sandbox.nofrixion.com/api/v1/payouts";
+string SANDBOX_PAYOUTS_URL = "https://api-sandbox.nofrixion.com/api/v1/payouts";
 
 HttpContent paymentData = new FormUrlEncodedContent(
     new List<KeyValuePair<string, string>> {
@@ -35,7 +35,7 @@ HttpContent paymentData = new FormUrlEncodedContent(
                 new KeyValuePair<string, string>("TheirReference", "Their Ref")
     });
 
-HttpResponseMessage response = await client.PostAsync(url, paymentData);
+HttpResponseMessage response = await client.PostAsync(SANDBOX_PAYOUTS_URL, paymentData);
 
 // 200 on success
 Console.WriteLine(response.StatusCode);
