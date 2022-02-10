@@ -17,7 +17,7 @@ using System.Net.Http.Json;
 
 const string SANDBOX_PAYOUTS_URL = "https://api-sandbox.nofrixion.com/api/v1/payouts";
 
-string jwtToken = Environment.GetEnvironmentVariable("NOFRIXION_SANDBOX_TOKEN");
+var jwtToken = Environment.GetEnvironmentVariable("NOFRIXION_SANDBOX_TOKEN");
 
 // specify id of payout to update
 string payoutId = "d6ce03c7-d850-43f1-1cfe-08d9eb8a1950";

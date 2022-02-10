@@ -13,7 +13,6 @@
 // 4. If successful user the user's profile details will be displayed.
 //-----------------------------------------------------------------------------
 
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
 const string SANDBOX_USER_URL = "https://api-sandbox.nofrixion.com/api/v1/user";
@@ -30,10 +29,16 @@ try
     var response = await client.GetAsync(SANDBOX_USER_URL);
     response.EnsureSuccessStatusCode();
 
-    UserProfile userProfile = await response.Content.ReadFromJsonAsync<UserProfile>();
-
-    // View contents of user file, can also access as userProfile.firstName etc.
-    Console.WriteLine(userProfile.ToString());
+    var userProfile = await response.Content.ReadFromJsonAsync<UserProfile>();
+    if (userProfile != null)
+    {
+        // View contents of user profile, can also access as userProfile.firstName etc.
+        Console.WriteLine(userProfile.ToString());
+    }
+    else
+    {
+        Console.WriteLine("No user profile found.");
+    }
 }
 catch (Exception e)
 {

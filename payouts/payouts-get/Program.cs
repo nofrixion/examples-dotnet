@@ -12,7 +12,6 @@
 // 4. If successful a list of selected payout details will be displayed.
 //-----------------------------------------------------------------------------
 
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
 const string SANDBOX_PAYOUTS_URL = "https://api-sandbox.nofrixion.com/api/v1/payouts";
@@ -30,11 +29,17 @@ try
 
     // returns a list of payouts
     var payouts = await response.Content.ReadFromJsonAsync<List<Payout>>();
-
-    // do something with response, e.g. print some relevant payout fields for each payout
-    foreach (var payout in payouts)
+    if (payouts != null)
     {
-        Console.WriteLine($"Send {payout.currency} {payout.amount:0.00} to {payout.destinationIban} ({payout.yourReference})");
+        // do something with response, e.g. print some relevant payout fields for each payout
+        foreach (var payout in payouts)
+        {
+            Console.WriteLine($"Send {payout.currency} {payout.amount:0.00} to {payout.destinationIban} ({payout.yourReference})");
+        }
+    }
+    else
+    {
+        Console.WriteLine("No payouts returned.");
     }
 
 }

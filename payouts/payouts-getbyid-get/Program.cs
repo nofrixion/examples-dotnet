@@ -13,12 +13,11 @@
 // 4. If successful a the selected payout details will be displayed followed by the approval URL.
 //-----------------------------------------------------------------------------
 
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
 const string SANDBOX_PAYOUTS_URL = "https://api-sandbox.nofrixion.com/api/v1/payouts";
 
-string jwtToken = Environment.GetEnvironmentVariable("NOFRIXION_SANDBOX_TOKEN");
+var jwtToken = Environment.GetEnvironmentVariable("NOFRIXION_SANDBOX_TOKEN");
 
 // specify id of payout to return
 string payoutId = "90ca721d-625f-4826-9f3b-7faec90a9832";
@@ -33,21 +32,27 @@ try
     response.EnsureSuccessStatusCode();
 
     // returns requested payout
-    Payout payout = await response.Content.ReadFromJsonAsync<Payout>();
+    var payout = await response.Content.ReadFromJsonAsync<Payout>();
+    if (payout != null)
+    {
+        // displays data in the payout
+        Console.WriteLine(payout);
 
-    // displays data in the payout
-    Console.WriteLine(payout);
-
-    // for authorising a payout you want to use the approvePayoutUrl property
-    Console.WriteLine("\nOr just access the approval Url:");
-    Console.WriteLine(payout.approvePayoutUrl);
+        // for authorising a payout you want to use the approvePayoutUrl property
+        Console.WriteLine("\nOr just access the approval Url:");
+        Console.WriteLine(payout.approvePayoutUrl);
+    }
+    else
+    {
+        Console.WriteLine("No payout returned");
+    }
 }
 catch (Exception e)
 {
     Console.WriteLine($"Error: {e.Message}");
 }
 
-// record for returned payout fields (note this endpoint returns more data than the /payouts GET)
+// Type declarations for returned data
 record Payout(string currentUserID, string currentUserRole, string approvePayoutUrl, string id,
                 string accountID, string userID, string type, string description, string currency,
                 decimal amount, string yourReference, string destinationIBAN, string destinationAccountID,

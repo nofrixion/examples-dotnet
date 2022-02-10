@@ -15,7 +15,7 @@
 using System.Net.Http;
 
 //Remember to keep the JWT token safe and secure.
-string jwtToken = Environment.GetEnvironmentVariable("NOFRIXION_SANDBOX_TOKEN");
+var jwtToken = Environment.GetEnvironmentVariable("NOFRIXION_SANDBOX_TOKEN");
 
 var client = new HttpClient();
 
