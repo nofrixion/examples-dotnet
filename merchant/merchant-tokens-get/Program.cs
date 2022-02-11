@@ -15,11 +15,10 @@
 
 using System.Net.Http.Json;
 
-const string URL = "https://api-sandbox.nofrixion.com/api/v1/merchant/tokens";
-
 var jwtToken = Environment.GetEnvironmentVariable("NOFRIXION_SANDBOX_TOKEN");
 
-var merchantId = "a234eb2e-1118-4a69-b550-e945961790ab";
+const string URL = "https://api-sandbox.nofrixion.com/api/v1/merchant/tokens";
+string merchantId = "a234eb2e-1118-4a69-b550-e945961790ab";
 
 var client = new HttpClient();
 
