@@ -1,7 +1,7 @@
 ﻿//-----------------------------------------------------------------------------
-// Description: Example of calling the NoFrixion MoneyMoov API user/tokens 
+// Description: Example of calling the NoFrixion MoneyMoov API merchant/tokens 
 // GET method. It provides a convenient way to retrieve information about  
-// access tokens issued to the authenticated user.
+// tokens issued to the specified merchant.
 //
 // Usage:
 // 1. Create a user access token in the sandbox portal at:
@@ -10,14 +10,16 @@
 //    set NOFRIXION_SANDBOX_TOKEN=<JWT token from previous step>
 // 3. Run the applicatio using:
 //    dotnet run
-// 4. If successful user the user's API access tokens.
+// 4. If successful a list of merchant tokens is displayed.
 //-----------------------------------------------------------------------------
 
 using System.Net.Http.Json;
 
 const string URL = "https://api-sandbox.nofrixion.com/api/v1/merchant/tokens";
 
-var jwtToken = Environment.GetEnvironmentVariable("NOFRIXION_SANDBOX_MERCHANT_TOKEN");
+var jwtToken = Environment.GetEnvironmentVariable("NOFRIXION_SANDBOX_TOKEN");
+
+var merchantId = "6f80138d-870b-4b07-8bc4-a4fd33a0d30f";
 
 var client = new HttpClient();
 
@@ -26,13 +28,13 @@ client.DefaultRequestHeaders.Add("Authorization", $"Bearer {jwtToken}");
 
 try
 {
-    var response = await client.GetAsync(URL);
+    var response = await client.GetAsync($"{URL}/{merchantId}");
     response.EnsureSuccessStatusCode();
 
-    var userTokens = await response.Content.ReadFromJsonAsync<List<UserToken>>();
-    if (userTokens != null)
+    var tokens = await response.Content.ReadFromJsonAsync<List<MerchantToken>>();
+    if (tokens != null && tokens.Count != 0)
     {
-        foreach (var token in userTokens)
+        foreach (var token in tokens)
         {
             // Display token information
             Console.WriteLine(token);
@@ -49,7 +51,5 @@ catch (Exception e)
     Console.WriteLine($"Error: {e.Message}");
 }
 
-
 // Type declarations for returned data
-record UserToken(string id, string userID, string type, string description, string accessTokenHash,
-            string refreshTokenHash, string inserted, string lastUpdated);
+record MerchantToken(string id, string merchantId, string description, string inserted, string lastUpdated);
