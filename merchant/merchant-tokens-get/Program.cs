@@ -19,7 +19,7 @@ const string URL = "https://api-sandbox.nofrixion.com/api/v1/merchant/tokens";
 
 var jwtToken = Environment.GetEnvironmentVariable("NOFRIXION_SANDBOX_TOKEN");
 
-var merchantId = "6f80138d-870b-4b07-8bc4-a4fd33a0d30f";
+var merchantId = "a234eb2e-1118-4a69-b550-e945961790ab";
 
 var client = new HttpClient();
 
