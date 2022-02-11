@@ -32,9 +32,7 @@ try
     var userMerchants = await response.Content.ReadFromJsonAsync<UserMerchants>();
     if (userMerchants != null)
     {
-        // can merchant currently associated with user context
-        Console.WriteLine($"Current merchant: {userMerchants.CurrentMerchantName}");
-        // Or view all merchants associated with the authenticated
+        // View all merchants associated with the authenticated
         foreach (Merchant merchant in userMerchants.merchants)
         {
             Console.WriteLine(merchant);
