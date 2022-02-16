@@ -15,7 +15,7 @@
 
 using System.Net.Http.Json;
 
-const string url = "https://api-dev.nofrixion.com/api/v1/merchants";
+const string url = "https://api-sandbox.nofrixion.com/api/v1/merchants";
 
 var jwtToken = Environment.GetEnvironmentVariable("NOFRIXION_USER_TOKEN");
 
