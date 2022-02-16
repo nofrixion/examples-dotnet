@@ -1,6 +1,6 @@
 ﻿//-----------------------------------------------------------------------------
-// Description: Example of calling the NoFrixion MoneyMoov API user/merchants 
-// GET method. It provides a convenient way to retrieve a merchants authorised
+// Description: Example of calling the NoFrixion MoneyMoov API merchants 
+// GET method. It provides a convenient way to retrieve a list of merchants authorised
 // for the authenticated user.
 //
 // Usage:
@@ -10,14 +10,14 @@
 //    set NOFRIXION_SANDBOX_TOKEN=<JWT token from previous step>
 // 3. Run the applicatio using:
 //    dotnet run
-// 4. If successful user the associated merchants will be displayed.
+// 4. If successful the merchants associated with the user token will be displayed.
 //-----------------------------------------------------------------------------
 
 using System.Net.Http.Json;
 
-const string SANDBOX_USER_MERCHANTS_URL = "https://api-sandbox.nofrixion.com/api/v1/user/merchants";
+const string url = "https://api-dev.nofrixion.com/api/v1/merchants";
 
-var jwtToken = Environment.GetEnvironmentVariable("NOFRIXION_SANDBOX_TOKEN");
+var jwtToken = Environment.GetEnvironmentVariable("NOFRIXION_USER_TOKEN");
 
 var client = new HttpClient();
 
@@ -26,13 +26,13 @@ client.DefaultRequestHeaders.Add("Authorization", $"Bearer {jwtToken}");
 
 try
 {
-    var response = await client.GetAsync(SANDBOX_USER_MERCHANTS_URL);
+    var response = await client.GetAsync(url);
     response.EnsureSuccessStatusCode();
 
     var userMerchants = await response.Content.ReadFromJsonAsync<UserMerchants>();
     if (userMerchants != null)
     {
-        // View all merchants associated with the authenticated
+        // View all merchants associated with the authenticated user
         foreach (Merchant merchant in userMerchants.merchants)
         {
             Console.WriteLine(merchant);

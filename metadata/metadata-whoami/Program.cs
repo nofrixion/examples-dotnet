@@ -9,16 +9,34 @@
 //    set NOFRIXION_SANDBOX_TOKEN=<JWT token from previous step>
 // 3. Run the applicatio using:
 //    dotnet run
-// 4. If successful a GUID, representing your user ID, will be displayed on 
-//    the console.
+// 4. If successful a JSON object containing the user profile will be printed.
 //-----------------------------------------------------------------------------
 
-using System.Net.Http.Headers;
+using System.Net.Http.Json;
 
-const string SANDBOX_METADATA_WHOAMI_URL = "https://api-sandbox.nofrixion.com/api/v1/metadata/whoami";
+const string url = "https://api-sandbox.nofrixion.com/api/v1/metadata/whoami";
 
-var jwtToken = Environment.GetEnvironmentVariable("NOFRIXION_SANDBOX_TOKEN");
+var jwtToken = Environment.GetEnvironmentVariable("NOFRIXION_USER_TOKEN");
 
 var client = new HttpClient();
-client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
-Console.WriteLine(await client.GetStringAsync(SANDBOX_METADATA_WHOAMI_URL));
+client.DefaultRequestHeaders.Add("Accept", "application/json");
+client.DefaultRequestHeaders.Add("Authorization", $"Bearer {jwtToken}");
+try
+{
+    var response = await client.GetAsync(url);
+    response.EnsureSuccessStatusCode();
+
+    // returns user profile object
+    var user = await response.Content.ReadFromJsonAsync<UserProfile>();
+    if (user != null)
+    {
+        Console.WriteLine(user);
+    }
+}
+catch (Exception e)
+{
+    Console.WriteLine($"Error: {e.Message}");
+}
+
+// Type declarations for returned data
+record UserProfile(string id, string firstName, string lastName, string emailAddress);

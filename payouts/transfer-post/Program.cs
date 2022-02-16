@@ -9,15 +9,15 @@
 //    set NOFRIXION_SANDBOX_TOKEN=<JWT token from previous step>
 /// 3. Run the applicatio using:
 //    dotnet run
-// 4. If successful JSON string confirming transfer detais is returned.
+// 4. If successful status OK and transfer details are returned.
 //-----------------------------------------------------------------------------
 
-using System.Net.Http;
+using System.Net.Http.Json;
 
 //Remember to keep the JWT token safe and secure.
-var jwtToken = Environment.GetEnvironmentVariable("NOFRIXION_SANDBOX_TOKEN");
+var jwtToken = Environment.GetEnvironmentVariable("NOFRIXION_USER_TOKEN");
 
-string SANDBOX_TRANSFERS_URL = "https://api-sandbox.nofrixion.com/api/v1/transfers";
+string url = "https://api-sandbox.nofrixion.com/api/v1/payouts/transfer";
 
 var client = new HttpClient();
 
@@ -35,10 +35,24 @@ HttpContent transferData = new FormUrlEncodedContent(
                 new KeyValuePair<string, string>("ExternalReference", "Ext Reference")
     });
 
-HttpResponseMessage response = await client.PostAsync(SANDBOX_TRANSFERS_URL, transferData);
+try
+{
+    var response = await client.PostAsync(url, transferData);
 
-// Status "Created" on success
-Console.WriteLine(response.StatusCode);
+    // Status "OK" on success
+    Console.WriteLine(response.StatusCode);
 
-// Or JSON string containing transfer details
-Console.WriteLine(await response.Content.ReadAsStringAsync());
+    // Or JSON object confirming transfer details
+    Console.WriteLine(await response.Content.ReadFromJsonAsync<Transfer>());
+}
+catch (Exception e){
+    Console.WriteLine($"Error: {e.Message}");
+}
+
+// Type declarations for returned data
+record TransferDestination(string type, string id);
+record TransferDetails(string sourceAccountId, string destinationId, string destinationType,
+            TransferDestination destination, string currency, decimal amount, string reference,
+            string externalReference);
+record Transfer(bool isEmpty, string approvalStatus, string status, string id,
+            string createdDate, string externalReference, TransferDetails details);

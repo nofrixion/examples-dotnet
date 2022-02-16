@@ -1,6 +1,6 @@
 ﻿//-----------------------------------------------------------------------------
-// Description: Example of calling the NoFrixion MoneyMoov API merchant/tokens DELETE 
-// method. It provides a convenient way to delete a merchant token.
+// Description: Example of calling the NoFrixion MoneyMoov API merchants/tokens/{tokenId}  
+// DELETE method. It provides a convenient way to delete a merchant token.
 //
 // Usage:
 // 1. Create a user access token in the sandbox portal at:
@@ -13,26 +13,22 @@
 //    no longer be listed using the merchant/tokens GET method).
 //-----------------------------------------------------------------------------
 
-using System.Net.Http;
-using System.Text;
+const string URL = "https://api-sandbox.nofrixion.com/api/v1/merchants/tokens";
 
-const string URL = "https://api-sandbox.nofrixion.com/api/v1/merchant/tokens";
-
-var jwtToken = Environment.GetEnvironmentVariable("NOFRIXION_SANDBOX_TOKEN");
+var jwtToken = Environment.GetEnvironmentVariable("NOFRIXION_USER_TOKEN");
 
 var client = new HttpClient();
 
-client.DefaultRequestHeaders.Add("Accept", "application/text");
+client.DefaultRequestHeaders.Add("Accept", "application/json");
 client.DefaultRequestHeaders.Add("Authorization", $"Bearer {jwtToken}");
 
-string tokenId = "a7069d1a-5581-4eb7-8ffe-169bc94203e9";
+string tokenId = "ed2c1ca4-8c64-4d75-a64a-f3e6c00af500";
 
 try
 {
     var response = await client.DeleteAsync($"{URL}/{tokenId}");
     response.EnsureSuccessStatusCode();
 
-    // Resposne body contains merchant token - SAVE THIS! (it isn't stored in the MoneyMoov system)
     Console.WriteLine(response.StatusCode);
 }
 catch (Exception e)

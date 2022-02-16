@@ -1,5 +1,5 @@
 ﻿//-----------------------------------------------------------------------------
-// Description: Example of calling the NoFrixion MoneyMoov API merchant/tokens 
+// Description: Example of calling the NoFrixion MoneyMoov API merchants/{merchantId}/tokens 
 // GET method. It provides a convenient way to retrieve information about  
 // tokens issued to the specified merchant.
 //
@@ -15,10 +15,10 @@
 
 using System.Net.Http.Json;
 
-var jwtToken = Environment.GetEnvironmentVariable("NOFRIXION_SANDBOX_TOKEN");
+var jwtToken = Environment.GetEnvironmentVariable("NOFRIXION_USER_TOKEN");
 
-const string URL = "https://api-sandbox.nofrixion.com/api/v1/merchant/tokens";
-string merchantId = "a234eb2e-1118-4a69-b550-e945961790ab";
+const string baseUrl = "https://api-sandbox.nofrixion.com/api/v1/merchants";
+string merchantId = "ab4476a1-8364-4d13-91ce-f4c4ca4ee6be";
 
 var client = new HttpClient();
 
@@ -27,22 +27,21 @@ client.DefaultRequestHeaders.Add("Authorization", $"Bearer {jwtToken}");
 
 try
 {
-    var response = await client.GetAsync($"{URL}/{merchantId}");
+    var response = await client.GetAsync($"{baseUrl}/{merchantId}/tokens");
     response.EnsureSuccessStatusCode();
 
-    var tokens = await response.Content.ReadFromJsonAsync<List<MerchantToken>>();
-    if (tokens != null && tokens.Count != 0)
+    var merchantTokens = await response.Content.ReadFromJsonAsync<List<MerchantToken>>();
+    if (merchantTokens != null && merchantTokens.Count != 0)
     {
-        foreach (var token in tokens)
+        foreach (var merchantToken in merchantTokens)
         {
-            // Display token information
-            Console.WriteLine(token);
+            // Display merchant tokens token information
+            Console.WriteLine(merchantToken);
         }
     }
     else
     {
-        // This should never run as a token is required for the API call.
-        Console.WriteLine("No user tokens found.");
+        Console.WriteLine("No merchant tokens found.");
     }
 }
 catch (Exception e)
@@ -51,4 +50,5 @@ catch (Exception e)
 }
 
 // Type declarations for returned data
-record MerchantToken(string id, string merchantId, string description, string inserted, string lastUpdated);
+record MerchantToken(string id, string merchantId, string description, string inserted,
+            string lastUpdated);

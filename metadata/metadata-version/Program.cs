@@ -5,11 +5,32 @@
 // Usage:
 // 1. Run the applicatio using:
 //    dotnet run
-// 2. If successful a string with the current version of the version will be
+// 2. If successful a JSON object containing the current API version will be
 // displayed.
 //-----------------------------------------------------------------------------
 
-const string SANDBOX_METADATA_VERSION_URL = "https://api-sandbox.nofrixion.com/api/v1/metadata/version";
+using System.Net.Http.Json;
+
+const string url = "https://api-sandbox.nofrixion.com/api/v1/metadata/version";
 
 var client = new HttpClient();
-Console.WriteLine(await client.GetStringAsync(SANDBOX_METADATA_VERSION_URL));
+
+try
+{
+    var response = await client.GetAsync(url);
+    response.EnsureSuccessStatusCode();
+
+    // returns MoneyMoov api version object
+    var apiVersion = await response.Content.ReadFromJsonAsync<ApiVersion>();
+    if (apiVersion != null)
+    {
+        Console.WriteLine(apiVersion);
+    }
+}
+catch (Exception e)
+{
+    Console.WriteLine($"Error: {e.Message}");
+}
+
+// Type declarations for returned data
+record ApiVersion(int majorVersion, int minorVersion, int buildVersion, string releaseName);
