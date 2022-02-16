@@ -21,7 +21,7 @@ string url = "https://api-sandbox.nofrixion.com/api/v1/payouts/transfer";
 
 var client = new HttpClient();
 
-client.DefaultRequestHeaders.Add("Accept", "text/plain");
+client.DefaultRequestHeaders.Add("Accept", "application/json");
 client.DefaultRequestHeaders.Add("Authorization", $"Bearer {jwtToken}");
 
 
