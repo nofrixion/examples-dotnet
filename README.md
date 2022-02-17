@@ -7,7 +7,7 @@ Each subfolder contains examples of the api endpoints associated with a group of
 - metadata: useful for API troubleshooting and diagnostics
 - payouts: endpoints for creating and approving payouts (the sending of funds)
 - transfers: send funds between accounts belonging to the same merchant
-- users: reading and updating user profiles, associated merchants and creating and (coming soon) refreshing access tokens
+- users: reading and updating user profiles, associated merchants and creating and refreshing (coming soon) access tokens
 
 We will continue adding examples as the API develops. For more details see our API documentation
 
