@@ -13,20 +13,19 @@
 // 4. If successful a list of your transactions and some metadata will be displayed.
 //-----------------------------------------------------------------------------
 
-using System.Net.Http;
 using System.Net.Http.Json;
-using Newtonsoft.Json.Linq;
 
-var jwtToken = Environment.GetEnvironmentVariable("NOFRIXION_SANDBOX_TOKEN");
+const string baseUrl = "https://api-sandbox.nofrixion.com/api/v1/accounts";
+
+var jwtToken = Environment.GetEnvironmentVariable("NOFRIXION_USER_TOKEN");
 
 // Id of account to get transaction history from 
-string accountId = "A120P0JR";
+string accountID = "A120P0JR";
 
 // by default each call will return 20 transactions, we can change this using a query parameter as shown below.
-// specific pages can also be requested using query parameters
+// a start date or page number can also be requested using query parameters
 string queryParams = "?size=10";
 
-string SANDBOX_ACCOUNTS_TRANSACTIONS_GET_URL = $"https://api-sandbox.nofrixion.com/api/v1/accounts/{accountId}/transactions{queryParams}";
 
 var client = new HttpClient();
 client.DefaultRequestHeaders.Add("Accept", "application/json");
@@ -34,22 +33,35 @@ client.DefaultRequestHeaders.Add("Authorization", $"Bearer {jwtToken}");
 
 try
 {
-    var response = await client.GetAsync(SANDBOX_ACCOUNTS_TRANSACTIONS_GET_URL);
+    var response = await client.GetAsync($"{baseUrl}/{accountID}/transactions{queryParams}");
     response.EnsureSuccessStatusCode();
 
-    // the transactions is a fairly large data structure (see https://docs.nofrixion.com/reference/get_api-v1-accounts-accountid-transactions)
-    // rather than create a large class in this example, we have used NewtonSoft Json to create dynamic object from string (note, .Net's 
-    // ReadFromJsonAsync method doesn't correctly deserialize to <dynamic>)
-    
-    string transStr = await response.Content.ReadAsStringAsync();
-    dynamic transObj = JObject.Parse(transStr);
-    // the returned JSON contains a "transactions" property which is an array of transaction details
-    Console.WriteLine(transObj.transactions);
-    // and also some summary fields such as the page number and total number of page and transactions
-    Console.WriteLine($"Showing page {transObj.page + 1} of {transObj.totalPages + 1}. {transObj.totalSize} transactions in total.");
+    // response body contains some transaction page metadata JSON array of transactions
+    var page = await response.Content.ReadFromJsonAsync<TransactionPage>();
+    if (page != null)
+    {
+        // User some of the page metadata
+        Console.WriteLine($"Showing {page.page + 1} of {page.totalPages} ({page.size} of {page.totalSize} transactions)");
+        // Show the returned transactions
+        foreach (Transaction trans in page.transactions){
+            Console.WriteLine(trans);
+        }
+    }
+    else
+    {
+        Console.WriteLine($"No transactions returned.");
+    }
 }
 catch (Exception e) {
     Console.WriteLine($"Error: {e.Message}");
 }
+
+// Type definitiions for returned data
+// - This endpoint returns a "TransactionPageResponse": some metadata about the page and an array of transactions,
+//   the length of which is specified by the 'size' query parameter
+// - the example here uses a limited set of properties. A full list of properites for returned can be found at
+//   https://api-sandbox.nofrixion.com/swagger/v1/swagger.json in the TransactionPageResponse schema.
+record Transaction(decimal amount, string currency, string description, string id, string transactionDate);
+record TransactionPage(List<Transaction> transactions, int page, double pageStartBalance, int size, int totalPages, int totalSize);
 
 

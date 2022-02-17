@@ -13,29 +13,42 @@
 // 4. If successful a list of your accounts will be displayed.
 //-----------------------------------------------------------------------------
 
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
-const string SANDBOX_ACCOUNTS_GET_URL = "https://api-sandbox.nofrixion.com/api/v1/accounts";
+const string url = "https://api-sandbox.nofrixion.com/api/v1/accounts";
 
-var jwtToken = Environment.GetEnvironmentVariable("NOFRIXION_SANDBOX_TOKEN");
+var jwtToken = Environment.GetEnvironmentVariable("NOFRIXION_USER_TOKEN");
 
 var client = new HttpClient();
-client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
-var accounts = await client.GetFromJsonAsync<List<Account>>(SANDBOX_ACCOUNTS_GET_URL);
+client.DefaultRequestHeaders.Add("Accept", "application/json");
+client.DefaultRequestHeaders.Add("Authorization", $"Bearer {jwtToken}");
 
-if (accounts != null)
+try
 {
-    foreach (var account in accounts)
+    var response = await client.GetAsync(url);
+    response.EnsureSuccessStatusCode();
+
+    // response body contains JSON array of merchant accounts
+    var accounts = await response.Content.ReadFromJsonAsync<List<Account>>();
+    if (accounts != null)
     {
-        Console.WriteLine($"Name {account.Name}, Currency {account.Currency}, Balance {account.Balance}.");
+        foreach (var account in accounts)
+        {
+            Console.WriteLine(account);
+        }
+    }
+    else
+    {
+        Console.WriteLine(($"You do not have any accounts."));
     }
 }
-else
+catch (Exception e)
 {
-    Console.WriteLine(($"You do not have any accounts."));
+    Console.WriteLine($"Error: {e.Message}");
 }
 
-// The full list of properites can be found at https://api-sandbox.nofrixion.com/swagger/v1/swagger.json
-// and the MerchantAccount type.
-record Account(string Name, string Currency, string Balance);
+// Type definitiions for returned data
+// - The "Account" record is a parital list of properties returned by the API.
+// - the full list of properites for MerchantAccount can be found at https://api-sandbox.nofrixion.com/swagger/v1/swagger.json
+//   and the MerchantAccount schema.
+record Account(string customerID, string customerName, string name, string displayName, string currency, string balance);
