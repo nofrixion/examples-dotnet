@@ -15,7 +15,7 @@
 
 using System.Net.Http.Json;
 
-const string url = "https://api-sandbox.nofrixion.com/api/v1/merchants";
+const string baseUrl = "https://api-sandbox.nofrixion.com/api/v1/merchants";
 
 var jwtToken = Environment.GetEnvironmentVariable("NOFRIXION_USER_TOKEN");
 
@@ -26,7 +26,7 @@ client.DefaultRequestHeaders.Add("Authorization", $"Bearer {jwtToken}");
 
 try
 {
-    var response = await client.GetAsync(url);
+    var response = await client.GetAsync(baseUrl);
     response.EnsureSuccessStatusCode();
 
     var userMerchants = await response.Content.ReadFromJsonAsync<UserMerchants>();
@@ -49,6 +49,6 @@ catch (Exception e)
 }
 
 
-// Type declarations for returned data
+// Type definitions for returned data
 record Merchant(string id, string name, bool enabled, string modulrMerchantID, string merchantCategoryCode);
 record UserMerchants(string CurrentMerchantName, string currentMerchantId, List<Merchant> merchants);
