@@ -1,7 +1,7 @@
 ﻿//-----------------------------------------------------------------------------
-// Description: Example of calling the NoFrixion MoneyMoov API user/tokens 
+// Description: Example of calling the NoFrixion MoneyMoov API user/tokens/{id} 
 // GET method. It provides a convenient way to retrieve information about  
-// access tokens issued to the authenticated user.
+// the specified access token.
 //
 // Usage:
 // 1. Create a user access token in the sandbox portal at:
@@ -10,7 +10,7 @@
 //    set NOFRIXION_USER_TOKEN=<JWT token from previous step>
 // 3. Run the applicatio using:
 //    dotnet run
-// 4. If successful the user's API access tokens will be displayed.
+// 4. If successful the details of the specified user access token will be displayed.
 //-----------------------------------------------------------------------------
 
 using System.Net.Http.Json;
@@ -19,6 +19,8 @@ const string baseUrl = "https://api-sandbox.nofrixion.com/api/v1/user/tokens";
 
 var jwtToken = Environment.GetEnvironmentVariable("NOFRIXION_USER_TOKEN");
 
+string tokenID = "9effefdb-3f86-42f8-aa10-addb9c6069dc";
+
 var client = new HttpClient();
 
 client.DefaultRequestHeaders.Add("Accept", "application/json");
@@ -26,17 +28,14 @@ client.DefaultRequestHeaders.Add("Authorization", $"Bearer {jwtToken}");
 
 try
 {
-    var response = await client.GetAsync(baseUrl);
+    var response = await client.GetAsync($"{baseUrl}/{tokenID}");
     response.EnsureSuccessStatusCode();
 
-    var userTokens = await response.Content.ReadFromJsonAsync<List<UserToken>>();
-    if (userTokens != null)
+    var userToken = await response.Content.ReadFromJsonAsync<UserToken>();
+    if (userToken != null)
     {
-        foreach (var token in userTokens)
-        {
             // Display token information
-            Console.WriteLine(token);
-        }
+            Console.WriteLine(userToken);
     }
     else
     {

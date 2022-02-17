@@ -1,7 +1,7 @@
 ﻿//-----------------------------------------------------------------------------
 // Description: Example of calling the NoFrixion MoneyMoov API user/tokens 
-// GET method. It provides a convenient way to retrieve information about  
-// access tokens issued to the authenticated user.
+// POST method. It provides a convenient way to intiate the creation of a new  
+// user access token.
 //
 // Usage:
 // 1. Create a user access token in the sandbox portal at:
@@ -10,7 +10,8 @@
 //    set NOFRIXION_USER_TOKEN=<JWT token from previous step>
 // 3. Run the applicatio using:
 //    dotnet run
-// 4. If successful the user's API access tokens will be displayed.
+// 4. If successful the pre-token will be returned and the token approval URL will
+//    displayed.
 //-----------------------------------------------------------------------------
 
 using System.Net.Http.Json;
@@ -24,24 +25,28 @@ var client = new HttpClient();
 client.DefaultRequestHeaders.Add("Accept", "application/json");
 client.DefaultRequestHeaders.Add("Authorization", $"Bearer {jwtToken}");
 
+HttpContent postData = new FormUrlEncodedContent(
+    new List<KeyValuePair<string, string>> {
+                new KeyValuePair<string,string>("MerchantID","6f80138d-870b-4b07-8bc4-a4fd33a0d30f"),
+                new KeyValuePair<string,string>("Description","API created user token")
+    });
 try
 {
-    var response = await client.GetAsync(baseUrl);
+    var response = await client.PostAsync(baseUrl, postData);
     response.EnsureSuccessStatusCode();
 
-    var userTokens = await response.Content.ReadFromJsonAsync<List<UserToken>>();
-    if (userTokens != null)
+    var preToken = await response.Content.ReadFromJsonAsync<UserToken>();
+    if (preToken != null)
     {
-        foreach (var token in userTokens)
-        {
-            // Display token information
-            Console.WriteLine(token);
-        }
+        // The response body contains a JSON 'pre-token'. Redirect the user to the approveTokenUrl
+        // where they will be asked to perform strong authentication and then redirected back
+        // to the NoFrixion portal where their token and refresh token will be visible.
+        Console.WriteLine(preToken.approveTokenUrl);
     }
     else
     {
         // This should never run as a token is required for the API call.
-        Console.WriteLine("No user tokens found.");
+        Console.WriteLine("No user tokens created.");
     }
 }
 catch (Exception e)
@@ -50,6 +55,6 @@ catch (Exception e)
 }
 
 
-// Type definition for returned data
+// Type definition for response data
 record UserToken(string id, string userID, string type, string description, string accessTokenHash,
             string refreshTokenHash, string inserted, string lastUpdated, string approveTokenUrl);
