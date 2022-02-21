@@ -18,7 +18,7 @@ using System.Net.Http.Json;
 var jwtToken = Environment.GetEnvironmentVariable("NOFRIXION_USER_TOKEN");
 
 const string baseUrl = "https://api-sandbox.nofrixion.com/api/v1/merchants";
-string merchantId = "ab4476a1-8364-4d13-91ce-f4c4ca4ee6be";
+string merchantId = "6f80138d-870b-4b07-8bc4-a4fd33a0d30f";
 
 var client = new HttpClient();
 
