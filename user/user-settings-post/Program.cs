@@ -22,7 +22,7 @@ var jwtToken = Environment.GetEnvironmentVariable("NOFRIXION_USER_TOKEN");
 
 var client = new HttpClient();
 
-client.DefaultRequestHeaders.Add("Accept", "application/text");
+client.DefaultRequestHeaders.Add("Accept", "application/json");
 client.DefaultRequestHeaders.Add("Authorization", $"Bearer {jwtToken}");
 
 string settingName = "CurrentMerchantID";

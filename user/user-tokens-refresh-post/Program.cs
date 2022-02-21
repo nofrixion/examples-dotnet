@@ -25,7 +25,7 @@ client.DefaultRequestHeaders.Add("Authorization", $"Bearer {jwtToken}");
 
 HttpContent postData = new FormUrlEncodedContent(
     new List<KeyValuePair<string, string>> {
-                new KeyValuePair<string,string>("refreshToken","AFNmCy_fXXQPViPaHNb5GQSpeMrKNAfLwIfzZl_BzGCZv")
+                new KeyValuePair<string,string>("refreshToken","v1.Mumv0QKNnuszGS96ZKxBHSZrZQVItqgWOk46LToOlYN3PeeqOKyWqBUofJOCxXgdvqVBq8WOuXlIilBTlO0rcKc")
     });
     
 try
@@ -33,12 +33,13 @@ try
     var response = await client.PostAsync(baseUrl, postData);
     response.EnsureSuccessStatusCode();
 
-    var userToken = await response.Content.ReadFromJsonAsync<UpdatedToken>();
-    if (userToken != null)
+    var newToken = await response.Content.ReadFromJsonAsync<UpdatedToken>();
+    if (newToken != null)
     {
-        // The response body contains a new user access and refresh token. 
+        // The response body contains a new user access and refresh tokens. 
         // These must be securely stored - they ARE NOT stored in the NoFrixion database.
-        Console.WriteLine(userToken);
+        Console.WriteLine(newToken.accessToken);
+        Console.WriteLine(newToken.refreshToken);
     }
     else
     {

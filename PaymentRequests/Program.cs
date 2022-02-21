@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // Description: Example of calling the NoFrixion MoneyMoov API paymentrequests POST 
-// method. It provides a way to request payment from third parties.
+// method. It provides a way to initiate payment from third parties.
 //
 // Usage:
 // 1. Create a MERCHANT access token in the sandbox portal at:
