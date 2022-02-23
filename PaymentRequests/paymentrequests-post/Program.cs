@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // Description: Example of calling the NoFrixion MoneyMoov API paymentrequests POST 
-// method. It provides a way to initiate payment from third parties.
+// method. It provides a convenient way to initiate receipt of payment from third parties.
 //
 // Usage:
 // 1. Create a MERCHANT access token in the sandbox portal at:
@@ -9,13 +9,15 @@
 //    set NOFRIXION_MERCHANT_TOKEN=<JWT token from previous step>
 /// 3. Run the applicatio using:
 //    dotnet run
-// 4. If successful user status code "Created" will be displayed and JSON string
-//    confirming the payment request data.
+// 4. If successful user status code "Created" will be displayed followed by a
+//    JSON string confirming the payment request data.
 //-----------------------------------------------------------------------------
+
+using System.Net.Http.Json;
 
 const string baseUrl = "https://api-sandbox.nofrixion.com/api/v1/paymentrequests";
 
-//Remember to keep the JWT token safe and secure.
+// Payment requests use MERCHANT tokens (remember to keep these safe and secure).
 var jwtToken = Environment.GetEnvironmentVariable("NOFRIXION_MERCHANT_TOKEN");
 
 var client = new HttpClient();
@@ -27,6 +29,7 @@ var paymentRequest = new Dictionary<string, string>();
 paymentRequest.Add("MerchantID", "AB4476A1-8364-4D13-91CE-F4C4CA4EE6BE");
 paymentRequest.Add("Amount", "0.99");
 paymentRequest.Add("Currency", "EUR");
+paymentRequest.Add("CustomerID", "C202202024158");
 paymentRequest.Add("OrderID", "Sample order");
 paymentRequest.Add("PaymentMethodTypes", "card,pisp"); // BTC lightning payments coming soon!
 paymentRequest.Add("Description", "API Payment request");
@@ -48,15 +51,29 @@ HttpContent postData = new FormUrlEncodedContent(paymentRequest);
 try
 {
     HttpResponseMessage response = await client.PostAsync(baseUrl, postData);
-
-    // "created" on success
-    Console.WriteLine(response.StatusCode);
-
-    // JSON object with payment request details will be in the response body
-    Console.WriteLine(await response.Content.ReadAsStringAsync());
+    if (response.IsSuccessStatusCode)
+    {
+        // "Created" on success
+        Console.WriteLine(response.StatusCode);
+        // JSON object with payment request details will be in the response body
+        Console.WriteLine(await response.Content.ReadFromJsonAsync<PaymentRequest>());
+    }
+    else
+    {
+        // HTTP error codes will return a MoneyMoov API problem object
+        Console.WriteLine(await response.Content.ReadFromJsonAsync<ApiProblem>());
+    }
 }
 catch (Exception e)
 {
     Console.WriteLine($"Error: {e.Message}");
 }
 
+// type definition for response data
+record PaymentRequest(string id, string merchantID, decimal amount, string currency, string customerID,
+                string orderID, string paymentMethodTypes, string description, string pispAccountID, string shippingFirstName,
+                string shippingLastName, string shippingAddressLine1, string shippingAddressLine2, string shippingAddressCity,
+                string shippingAddressCounty, string shippingAddressPostCode, string shippingAddressCountryCode,
+                string shippingPhone, string shippingEmail, string originUrl, string callbackUrl, bool cardAuthorizeOnly,
+                bool cardCreateToken, bool ignoreAddressVerification, bool cardIgnoreCVN, string pispRecipientReference);
+record ApiProblem(string type, string title, int status, string detail);
