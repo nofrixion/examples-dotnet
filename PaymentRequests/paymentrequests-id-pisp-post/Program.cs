@@ -27,27 +27,25 @@ var client = new HttpClient();
 client.DefaultRequestHeaders.Add("Accept", "application/json");
 client.DefaultRequestHeaders.Add("Authorization", $"Bearer {jwtToken}");
 
+
+// Specify the payment request ID and PISP provider
 string paymentRequestID = "18fc90ae-0086-4ef3-8216-08d9f1deec34";
-string providerID="H120000002";
+string providerID = "H120000002";
 
 var postData = new StringContent($"providerID={providerID}", Encoding.UTF8, "application/x-www-form-urlencoded");
 
 try
 {
     HttpResponseMessage response = await client.PostAsync($"{baseUrl}/{paymentRequestID}/pisp", postData);
-    response.EnsureSuccessStatusCode();
-
-    // returns a list of paymentRequest
-    var pispResponse = await response.Content.ReadFromJsonAsync<PispResponse>();
-    if (pispResponse != null)
+    if (response.IsSuccessStatusCode)
     {
-        // Response is an JSON object containing PISP response details
+        var pispResponse = await response.Content.ReadFromJsonAsync<PispResponse>();
         Console.WriteLine(pispResponse);
-
     }
     else
     {
-        Console.WriteLine("No response returned.");
+        // HTTP error codes will return a MoneyMoov API problem object
+        Console.WriteLine(await response.Content.ReadFromJsonAsync<ApiProblem>());
     }
 }
 catch (Exception e)
@@ -57,3 +55,5 @@ catch (Exception e)
 
 // type definition for response data
 record PispResponse(string paymentInitiationId, string redirectUrl, string plaidLinkToken);
+
+record ApiProblem(string type, string title, int status, string detail);

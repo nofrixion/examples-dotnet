@@ -56,4 +56,5 @@ record PaymentRequest(string id, string merchantID, decimal amount, string curre
                 string shippingAddressCounty, string shippingAddressPostCode, string shippingAddressCountryCode,
                 string shippingPhone, string shippingEmail, string originUrl, string callbackUrl, bool cardAuthorizeOnly,
                 bool cardCreateToken, bool ignoreAddressVerification, bool cardIgnoreCVN, string pispRecipientReference);
+
 record ApiProblem(string type, string title, int status, string detail);
