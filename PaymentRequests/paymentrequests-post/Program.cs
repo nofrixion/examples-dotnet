@@ -31,7 +31,8 @@ paymentRequest.Add("Amount", "0.99");
 paymentRequest.Add("Currency", "EUR");
 paymentRequest.Add("CustomerID", "C202202024158");
 paymentRequest.Add("OrderID", "Sample order");
-paymentRequest.Add("PaymentMethodTypes", "card,pisp"); // BTC lightning payments coming soon!
+// The methods below allow the purchaser to choose from those listed - BTC lightning payments coming soon!
+paymentRequest.Add("PaymentMethodTypes", "card,pisp");
 paymentRequest.Add("Description", "API Payment request");
 // URLs to integrate with merchant's site (required for card payments)
 paymentRequest.Add("OriginUrl", "https://some.origin.url");

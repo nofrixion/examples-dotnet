@@ -32,17 +32,9 @@ try
     HttpResponseMessage response = await client.GetAsync($"{baseUrl}/{paymentRequestID}");
     if (response.IsSuccessStatusCode)
     {
-        // returns a paymentRequest
+        // returns a JSON object containing payment request details
         var paymentRequest = await response.Content.ReadFromJsonAsync<PaymentRequest>();
-        if (paymentRequest != null)
-        {
-            // JSON object containing payment request details
-            Console.WriteLine(paymentRequest);
-        }
-        else
-        {
-            Console.WriteLine("No paymentRequest returned.");
-        }
+        Console.WriteLine(paymentRequest);
     }
     else
     {
