@@ -9,7 +9,6 @@
 //    set NOFRIXION_MERCHANT_TOKEN=<JWT token from previous step>
 /// 3. Run the applicatio using:
 //    dotnet run
-
 // 4. If successful the JSON object containing the payment request result data will be displayed.
 //-----------------------------------------------------------------------------
 
@@ -32,19 +31,14 @@ try
     HttpResponseMessage response = await client.GetAsync($"{baseUrl}/{paymentRequestID}/result");
     if (response.IsSuccessStatusCode)
     {
-        // returns a paymentRequest
-        var prResult = await response.Content.ReadFromJsonAsync<PaymentRequestResult>();
-
         // JSON object containing payment request result
-        Console.WriteLine(prResult);
+        Console.WriteLine(await response.Content.ReadFromJsonAsync<PaymentRequestResult>());
     }
     else
     {
         // HTTP error codes will return a MoneyMoov API problem object
         Console.WriteLine(await response.Content.ReadFromJsonAsync<ApiProblem>());
     }
-
-
 }
 catch (Exception e)
 {
@@ -55,4 +49,5 @@ catch (Exception e)
 record PaymentRequestResult(string paymentRequestID, string requestID, string transactionID, decimal amount, string currency,
                 string result, string status, string errorReason, string errorMessage, string cardTokenCustomerID,
                 string cardAuthorizationResponseID);
+
 record ApiProblem(string type, string title, int status, string detail);

@@ -39,8 +39,8 @@ try
     HttpResponseMessage response = await client.PostAsync($"{baseUrl}/{paymentRequestID}/pisp", postData);
     if (response.IsSuccessStatusCode)
     {
-        var pispResponse = await response.Content.ReadFromJsonAsync<PispResponse>();
-        Console.WriteLine(pispResponse);
+        // Payment initiation ID and redirect URL will be returned in JSON object.
+        Console.WriteLine(await response.Content.ReadFromJsonAsync<PispResponse>());
     }
     else
     {
