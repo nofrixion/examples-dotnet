@@ -18,7 +18,7 @@ using System.Net.Http.Json;
 var jwtToken = Environment.GetEnvironmentVariable("NOFRIXION_USER_TOKEN");
 
 const string baseUrl = "https://api-sandbox.nofrixion.com/api/v1/merchants";
-string merchantId = "6f80138d-870b-4b07-8bc4-a4fd33a0d30f";
+string merchantId = "a234eb2e-1118-4a69-b550-e945961790ab";
 
 var client = new HttpClient();
 
@@ -28,20 +28,26 @@ client.DefaultRequestHeaders.Add("Authorization", $"Bearer {jwtToken}");
 try
 {
     var response = await client.GetAsync($"{baseUrl}/{merchantId}/tokens");
-    response.EnsureSuccessStatusCode();
-
-    var merchantTokens = await response.Content.ReadFromJsonAsync<List<MerchantToken>>();
-    if (merchantTokens != null && merchantTokens.Count != 0)
+    if (response.IsSuccessStatusCode)
     {
-        foreach (var merchantToken in merchantTokens)
+        var merchantTokens = await response.Content.ReadFromJsonAsync<List<MerchantToken>>();
+        if (merchantTokens != null && merchantTokens.Count != 0)
         {
-            // Display merchant tokens token information
-            Console.WriteLine(merchantToken);
+            foreach (var merchantToken in merchantTokens)
+            {
+                // Display merchant tokens token information
+                Console.WriteLine(merchantToken);
+            }
+        }
+        else
+        {
+            Console.WriteLine("No merchant tokens found.");
         }
     }
     else
     {
-        Console.WriteLine("No merchant tokens found.");
+        // HTTP error codes will return a MoneyMoov API problem object
+        Console.WriteLine(await response.Content.ReadFromJsonAsync<ApiProblem>());
     }
 }
 catch (Exception e)
@@ -49,6 +55,8 @@ catch (Exception e)
     Console.WriteLine($"Error: {e.Message}");
 }
 
-// Type declarations for returned data
+// Type definitions for returned data
 record MerchantToken(string id, string merchantId, string description, string inserted,
             string lastUpdated);
+
+record ApiProblem(string type, string title, int status, string detail);

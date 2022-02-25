@@ -25,28 +25,34 @@ var client = new HttpClient();
 client.DefaultRequestHeaders.Add("Accept", "application/json");
 client.DefaultRequestHeaders.Add("Authorization", $"Bearer {jwtToken}");
 
-HttpContent postData = new FormUrlEncodedContent(
-    new List<KeyValuePair<string, string>> {
-                new KeyValuePair<string,string>("MerchantID","6f80138d-870b-4b07-8bc4-a4fd33a0d30f"),
-                new KeyValuePair<string,string>("Description","API created user token")
-    });
+var data = new Dictionary<string, string>();
+data.Add("MerchantID","6f80138d-870b-4b07-8bc4-a4fd33a0d30f");
+data.Add("Description","API created user token");
+
+HttpContent postData = new FormUrlEncodedContent(data);
+
 try
 {
     var response = await client.PostAsync(baseUrl, postData);
-    response.EnsureSuccessStatusCode();
-
-    var preToken = await response.Content.ReadFromJsonAsync<UserToken>();
-    if (preToken != null)
+    if (response.IsSuccessStatusCode)
     {
-        // The response body contains a JSON 'pre-token'. Redirect the user to the approveTokenUrl
-        // where they will be asked to perform strong authentication and then redirected back
-        // to the NoFrixion portal where their token and refresh token will be visible.
-        Console.WriteLine(preToken.approveTokenUrl);
+        var preToken = await response.Content.ReadFromJsonAsync<UserToken>();
+        if (preToken != null)
+        {
+            // The response body contains a JSON 'pre-token'. Redirect the user to the approveTokenUrl
+            // where they will be asked to perform strong authentication and then redirected back
+            // to the NoFrixion portal where their token and refresh token will be visible.
+            Console.WriteLine(preToken.approveTokenUrl);
+        }
+        else
+        {
+            Console.WriteLine("No user token created.");
+        }
     }
     else
     {
-        // This should never run as a token is required for the API call.
-        Console.WriteLine("No user tokens created.");
+        // HTTP error codes will return a MoneyMoov API problem object
+        Console.WriteLine(await response.Content.ReadFromJsonAsync<ApiProblem>());
     }
 }
 catch (Exception e)
@@ -54,7 +60,8 @@ catch (Exception e)
     Console.WriteLine($"Error: {e.Message}");
 }
 
-
-// Type definition for response data
+// Type definitions for response data
 record UserToken(string id, string userID, string type, string description, string accessTokenHash,
             string refreshTokenHash, string inserted, string lastUpdated, string approveTokenUrl);
+
+record ApiProblem(string type, string title, int status, string detail);

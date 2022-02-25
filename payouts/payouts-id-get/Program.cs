@@ -7,20 +7,20 @@
 // 1. Create a user access token in the sandbox portal at:
 //    https://portal-sandbox.nofrixion.com.
 // 2. Set the token as an environment variable in your console:
-//    set NOFRIXION_SANDBOX_TOKEN=<JWT token from previous step>
+//    set NOFRIXION_USER_TOKEN=<JWT token from previous step>
 // 3. Run the applicatio using:
 //    dotnet run
-// 4. If successful a the selected payout details will be displayed followed by the approval URL.
+// 4. If successful the selected payout details will be displayed followed by the approval URL.
 //-----------------------------------------------------------------------------
 
 using System.Net.Http.Json;
 
-const string SANDBOX_PAYOUTS_URL = "https://api-sandbox.nofrixion.com/api/v1/payouts";
+const string baseUrl = "https://api-sandbox.nofrixion.com/api/v1/payouts";
 
-var jwtToken = Environment.GetEnvironmentVariable("NOFRIXION_SANDBOX_TOKEN");
+var jwtToken = Environment.GetEnvironmentVariable("NOFRIXION_USER_TOKEN");
 
 // specify id of payout to return
-string payoutId = "90ca721d-625f-4826-9f3b-7faec90a9832";
+string payoutId = "b5a68371-b561-4123-e832-08d9eb89cb53";
 
 var client = new HttpClient();
 client.DefaultRequestHeaders.Add("Accept", "application/json");
@@ -28,23 +28,21 @@ client.DefaultRequestHeaders.Add("Authorization", $"Bearer {jwtToken}");
 
 try
 {
-    var response = await client.GetAsync($"{SANDBOX_PAYOUTS_URL}/getbyid/{payoutId}");
-    response.EnsureSuccessStatusCode();
-
-    // returns requested payout
-    var payout = await response.Content.ReadFromJsonAsync<Payout>();
-    if (payout != null)
+    var response = await client.GetAsync($"{baseUrl}/{payoutId}");
+    if (response.IsSuccessStatusCode)
     {
-        // displays data in the payout
-        Console.WriteLine(payout);
-
-        // for authorising a payout you want to use the approvePayoutUrl property
-        Console.WriteLine("\nOr just access the approval Url:");
-        Console.WriteLine(payout.approvePayoutUrl);
+        // returns requested payout
+        var payout = await response.Content.ReadFromJsonAsync<Payout>();
+        if (payout != null)
+        {
+            // displays payout data
+            Console.WriteLine(payout);
+        }
     }
     else
     {
-        Console.WriteLine("No payout returned");
+        // HTTP error codes will return a MoneyMoov API problem object
+        Console.WriteLine(await response.Content.ReadFromJsonAsync<ApiProblem>());
     }
 }
 catch (Exception e)
@@ -57,3 +55,5 @@ record Payout(string currentUserID, string currentUserRole, string approvePayout
                 string accountID, string userID, string type, string description, string currency,
                 decimal amount, string yourReference, string destinationIBAN, string destinationAccountID,
                 string destinationAccountName, string theirReference);
+
+record ApiProblem(string type, string title, int status, string detail);

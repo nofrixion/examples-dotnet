@@ -13,7 +13,9 @@
 //    no longer be listed using the merchant/tokens GET method).
 //-----------------------------------------------------------------------------
 
-const string URL = "https://api-sandbox.nofrixion.com/api/v1/merchants/tokens";
+using System.Net.Http.Json;
+
+const string baseUrl = "https://api-sandbox.nofrixion.com/api/v1/merchants/tokens";
 
 var jwtToken = Environment.GetEnvironmentVariable("NOFRIXION_USER_TOKEN");
 
@@ -22,17 +24,26 @@ var client = new HttpClient();
 client.DefaultRequestHeaders.Add("Accept", "application/json");
 client.DefaultRequestHeaders.Add("Authorization", $"Bearer {jwtToken}");
 
-string tokenId = "ed2c1ca4-8c64-4d75-a64a-f3e6c00af500";
+string tokenId = "eae5022d-40f8-4811-9d4f-49243795cf7c";
 
 try
 {
-    var response = await client.DeleteAsync($"{URL}/{tokenId}");
-    response.EnsureSuccessStatusCode();
-
-    Console.WriteLine(response.StatusCode);
+    var response = await client.DeleteAsync($"{baseUrl}/{tokenId}");
+    if (response.IsSuccessStatusCode)
+    {   
+        //HTTP staus "OK" on success.
+        Console.WriteLine(response.StatusCode);
+    }
+    else
+    {
+        // HTTP error codes will return a MoneyMoov API problem object
+        Console.WriteLine(await response.Content.ReadFromJsonAsync<ApiProblem>());
+    }
 }
 catch (Exception e)
 {
     Console.WriteLine($"Error: {e.Message}");
 }
 
+// Type definitions for returned data
+record ApiProblem(string type, string title, int status, string detail);

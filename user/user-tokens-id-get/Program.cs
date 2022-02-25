@@ -29,18 +29,16 @@ client.DefaultRequestHeaders.Add("Authorization", $"Bearer {jwtToken}");
 try
 {
     var response = await client.GetAsync($"{baseUrl}/{tokenID}");
-    response.EnsureSuccessStatusCode();
-
-    var userToken = await response.Content.ReadFromJsonAsync<UserToken>();
-    if (userToken != null)
+    if (response.IsSuccessStatusCode)
     {
-            // Display token information
-            Console.WriteLine(userToken);
+        // Display token information
+        var userToken = await response.Content.ReadFromJsonAsync<UserToken>();
+        Console.WriteLine(userToken);
     }
     else
     {
-        // This should never run as a token is required for the API call.
-        Console.WriteLine("No user tokens found.");
+        // HTTP error codes will return a MoneyMoov API problem object
+        Console.WriteLine(await response.Content.ReadFromJsonAsync<ApiProblem>());
     }
 }
 catch (Exception e)
@@ -49,6 +47,8 @@ catch (Exception e)
 }
 
 
-// Type definition for returned data
+// Type definitions for returned data
 record UserToken(string id, string userID, string type, string description, string accessTokenHash,
             string refreshTokenHash, string inserted, string lastUpdated, string approveTokenUrl);
+
+record ApiProblem(string type, string title, int status, string detail);

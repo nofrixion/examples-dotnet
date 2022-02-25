@@ -1,5 +1,5 @@
 ﻿//-----------------------------------------------------------------------------
-// Description: Example of calling the NoFrixion MoneyMoov API Accounts Get
+// Description: Example of calling the NoFrixion MoneyMoov API Accounts GET
 // method. It provides a convenient way to retrieve a list of your payment
 // accounts.
 //
@@ -30,17 +30,26 @@ try
 
     // response body contains JSON array of merchant accounts
     var accounts = await response.Content.ReadFromJsonAsync<List<Account>>();
-    if (accounts != null)
+    if (response.IsSuccessStatusCode)
     {
-        foreach (var account in accounts)
+        if (accounts != null)
         {
-            Console.WriteLine(account);
+            foreach (var account in accounts)
+            {
+                Console.WriteLine(account);
+            }
+        }
+        else
+        {
+            Console.WriteLine(($"You do not have any accounts."));
         }
     }
     else
     {
-        Console.WriteLine(($"You do not have any accounts."));
+        // HTTP error codes will return a MoneyMoov API problem object
+        Console.WriteLine(await response.Content.ReadFromJsonAsync<ApiProblem>());
     }
+
 }
 catch (Exception e)
 {
@@ -52,3 +61,5 @@ catch (Exception e)
 // - the full list of properites for MerchantAccount can be found at https://api-sandbox.nofrixion.com/swagger/v1/swagger.json
 //   and the MerchantAccount schema.
 record Account(string customerID, string customerName, string name, string displayName, string currency, string balance);
+
+record ApiProblem(string type, string title, int status, string detail);

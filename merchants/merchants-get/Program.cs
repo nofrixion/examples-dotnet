@@ -27,20 +27,26 @@ client.DefaultRequestHeaders.Add("Authorization", $"Bearer {jwtToken}");
 try
 {
     var response = await client.GetAsync(baseUrl);
-    response.EnsureSuccessStatusCode();
-
-    var userMerchants = await response.Content.ReadFromJsonAsync<UserMerchants>();
-    if (userMerchants != null)
+    if (response.IsSuccessStatusCode)
     {
-        // View all merchants associated with the authenticated user
-        foreach (Merchant merchant in userMerchants.merchants)
+        var userMerchants = await response.Content.ReadFromJsonAsync<UserMerchants>();
+        if (userMerchants != null)
         {
-            Console.WriteLine(merchant);
+            // View all merchants associated with the authenticated user
+            foreach (Merchant merchant in userMerchants.merchants)
+            {
+                Console.WriteLine(merchant);
+            }
+        }
+        else
+        {
+            Console.WriteLine("User is not associated with any merchants.");
         }
     }
     else
     {
-        Console.WriteLine("User is not associated with any merchants.");
+        // HTTP error codes will return a MoneyMoov API problem object
+        Console.WriteLine(await response.Content.ReadFromJsonAsync<ApiProblem>());
     }
 }
 catch (Exception e)
@@ -48,7 +54,8 @@ catch (Exception e)
     Console.WriteLine($"Error: {e.Message}");
 }
 
-
 // Type definitions for returned data
 record Merchant(string id, string name, bool enabled, string modulrMerchantID, string merchantCategoryCode);
 record UserMerchants(string CurrentMerchantName, string currentMerchantId, List<Merchant> merchants);
+
+record ApiProblem(string type, string title, int status, string detail);

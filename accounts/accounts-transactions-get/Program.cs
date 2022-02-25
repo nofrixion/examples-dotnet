@@ -34,25 +34,33 @@ client.DefaultRequestHeaders.Add("Authorization", $"Bearer {jwtToken}");
 try
 {
     var response = await client.GetAsync($"{baseUrl}/{accountID}/transactions{queryParams}");
-    response.EnsureSuccessStatusCode();
-
-    // response body contains some transaction page metadata JSON array of transactions
-    var page = await response.Content.ReadFromJsonAsync<TransactionPage>();
-    if (page != null)
+    if (response.IsSuccessStatusCode)
     {
-        // User some of the page metadata
-        Console.WriteLine($"Showing {page.page + 1} of {page.totalPages} ({page.size} of {page.totalSize} transactions)");
-        // Show the returned transactions
-        foreach (Transaction trans in page.transactions){
-            Console.WriteLine(trans);
+        // response body contains some transaction page metadata JSON array of transactions
+        var page = await response.Content.ReadFromJsonAsync<TransactionPage>();
+        if (page != null)
+        {
+            // User some of the page metadata
+            Console.WriteLine($"Showing page {page.page + 1} of {page.totalPages} ({page.size} of {page.totalSize} transactions)");
+            // Show the returned transactions
+            foreach (Transaction trans in page.transactions)
+            {
+                Console.WriteLine(trans);
+            }
+        }
+        else
+        {
+            Console.WriteLine($"No transactions returned.");
         }
     }
     else
     {
-        Console.WriteLine($"No transactions returned.");
+        // HTTP error codes will return a MoneyMoov API problem object
+        Console.WriteLine(await response.Content.ReadFromJsonAsync<ApiProblem>());
     }
 }
-catch (Exception e) {
+catch (Exception e)
+{
     Console.WriteLine($"Error: {e.Message}");
 }
 
@@ -64,4 +72,4 @@ catch (Exception e) {
 record Transaction(decimal amount, string currency, string description, string id, string transactionDate);
 record TransactionPage(List<Transaction> transactions, int page, double pageStartBalance, int size, int totalPages, int totalSize);
 
-
+record ApiProblem(string type, string title, int status, string detail);

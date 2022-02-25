@@ -18,13 +18,19 @@ var client = new HttpClient();
 try
 {
     var response = await client.GetAsync(url);
-    response.EnsureSuccessStatusCode();
-
-    // returns MoneyMoov api version object
-    var apiVersion = await response.Content.ReadFromJsonAsync<ApiVersion>();
-    if (apiVersion != null)
+    if (response.IsSuccessStatusCode)
     {
-        Console.WriteLine(apiVersion);
+        // returns MoneyMoov api version object
+        var apiVersion = await response.Content.ReadFromJsonAsync<ApiVersion>();
+        if (apiVersion != null)
+        {
+            Console.WriteLine(apiVersion);
+        }
+    }
+    else
+    {
+        // HTTP error codes will return a MoneyMoov API problem object
+        Console.WriteLine(await response.Content.ReadFromJsonAsync<ApiProblem>());
     }
 }
 catch (Exception e)
@@ -32,5 +38,6 @@ catch (Exception e)
     Console.WriteLine($"Error: {e.Message}");
 }
 
-// Type declarations for returned data
+// Type definitions for returned data
 record ApiVersion(int majorVersion, int minorVersion, int buildVersion, string releaseName);
+record ApiProblem(string type, string title, int status, string detail);

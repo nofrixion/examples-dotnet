@@ -23,28 +23,32 @@ var client = new HttpClient();
 client.DefaultRequestHeaders.Add("Accept", "application/json");
 client.DefaultRequestHeaders.Add("Authorization", $"Bearer {jwtToken}");
 
-HttpContent postData = new FormUrlEncodedContent(
-    new List<KeyValuePair<string, string>> {
-                new KeyValuePair<string,string>("refreshToken","v1.Mumv0QKNnuszGS96ZKxBHSZrZQVItqgWOk46LToOlYN3PeeqOKyWqBUofJOCxXgdvqVBq8WOuXlIilBTlO0rcKc")
-    });
-    
+var data = new Dictionary<string, string>();
+data.Add("refreshToken", "v1.M-mv0QKNnuszGS96ZKxBHSb_.....");
+
+HttpContent postData = new FormUrlEncodedContent(data);
 try
 {
     var response = await client.PostAsync(baseUrl, postData);
-    response.EnsureSuccessStatusCode();
-
-    var newToken = await response.Content.ReadFromJsonAsync<UpdatedToken>();
-    if (newToken != null)
+    if (response.IsSuccessStatusCode)
     {
-        // The response body contains a new user access and refresh tokens. 
-        // These must be securely stored - they ARE NOT stored in the NoFrixion database.
-        Console.WriteLine(newToken.accessToken);
-        Console.WriteLine(newToken.refreshToken);
+        var newToken = await response.Content.ReadFromJsonAsync<UpdatedToken>();
+        if (newToken != null)
+        {
+            // The response body contains a new user access and refresh tokens. 
+            // These must be securely stored - they ARE NOT stored in the NoFrixion database.
+            Console.WriteLine(newToken.accessToken);
+            Console.WriteLine(newToken.refreshToken);
+        }
+        else
+        {
+            Console.WriteLine("No token returned.");
+        }
     }
     else
     {
-        // This should never run as a token is required for the API call.
-        Console.WriteLine("No token returned.");
+        // HTTP error codes will return a MoneyMoov API problem object
+        Console.WriteLine(await response.Content.ReadFromJsonAsync<ApiProblem>());
     }
 }
 catch (Exception e)
@@ -52,5 +56,6 @@ catch (Exception e)
     Console.WriteLine($"Error: {e.Message}");
 }
 
-// Type definition for response data
+// Type definitions for response data
 record UpdatedToken(string accessToken, string refreshToken);
+record ApiProblem(string type, string title, int status, string detail);

@@ -6,6 +6,8 @@
 # other stuff we don't need - JB
 launch.json
 tasks.json
+*-id-card-*
+payouts-submit-id/
 
 # User-specific files
 *.rsuser

@@ -28,22 +28,29 @@ client.DefaultRequestHeaders.Add("Authorization", $"Bearer {jwtToken}");
 try
 {
     var response = await client.GetAsync(baseUrl);
-    response.EnsureSuccessStatusCode();
 
-    var userSettings = await response.Content.ReadFromJsonAsync<List<UserSetting>>();
-    if (userSettings != null)
+    if (response.IsSuccessStatusCode)
     {
-        // As of MoneyMoov v1.1.9 there is only one user setting (CurrentMerchantID), but more may be added in the future
-        foreach (UserSetting setting in userSettings)
+        var userSettings = await response.Content.ReadFromJsonAsync<List<UserSetting>>();
+        if (userSettings != null)
         {
-            Console.WriteLine($"Name: {setting.name}");
-            Console.WriteLine($"Value: {setting.value}");
-            Console.WriteLine($"Description: {setting.description}");
+            // As of MoneyMoov v1.1.9 there is only one user setting (CurrentMerchantID), but more may be added in the future
+            foreach (UserSetting setting in userSettings)
+            {
+                Console.WriteLine($"Name: {setting.name}");
+                Console.WriteLine($"Value: {setting.value}");
+                Console.WriteLine($"Description: {setting.description}");
+            }
+        }
+        else
+        {
+            Console.WriteLine("No user settings returned");
         }
     }
     else
     {
-        Console.WriteLine("No user settings returned");
+        // HTTP error codes will return a MoneyMoov API problem object
+        Console.WriteLine(await response.Content.ReadFromJsonAsync<ApiProblem>());
     }
 }
 catch (Exception e)
@@ -54,3 +61,4 @@ catch (Exception e)
 
 // Type definition for returned data
 record UserSetting(string name, string value, string description);
+record ApiProblem(string type, string title, int status, string detail);

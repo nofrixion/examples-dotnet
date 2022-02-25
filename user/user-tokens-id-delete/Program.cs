@@ -18,7 +18,7 @@ const string baseUrl = "https://api-sandbox.nofrixion.com/api/v1/user/tokens";
 
 var jwtToken = Environment.GetEnvironmentVariable("NOFRIXION_USER_TOKEN");
 
-string tokenID = "532cfdd2-a5f3-4628-8398-fb2e0931557a";
+string tokenID = "cf0ceff0-443c-4420-9b49-e8f28715a2a2";
 
 var client = new HttpClient();
 
@@ -28,11 +28,21 @@ client.DefaultRequestHeaders.Add("Authorization", $"Bearer {jwtToken}");
 try
 {
     var response = await client.DeleteAsync($"{baseUrl}/{tokenID}");
-
-    // Status Code "OK" on successful delete (check using user/tokens GET action)
-    Console.WriteLine(response.StatusCode);
+    if (response.IsSuccessStatusCode)
+    {
+        // Status Code "OK" on successful delete (check using user/tokens GET action)
+        Console.WriteLine(response.StatusCode);
+    }
+    else
+    {
+        // HTTP error codes will return a MoneyMoov API problem object
+        Console.WriteLine(await response.Content.ReadFromJsonAsync<ApiProblem>());
+    }
 }
 catch (Exception e)
 {
     Console.WriteLine($"Error: {e.Message}");
 }
+
+// type definition for returned data
+record ApiProblem(string type, string title, int status, string detail);

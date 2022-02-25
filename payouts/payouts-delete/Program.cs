@@ -6,28 +6,38 @@
 // 1. Create a user access token in the sandbox portal at:
 //    https://portal-sandbox.nofrixion.com.
 // 2. Set the token as an environment variable in your console:
-//    set NOFRIXION_SANDBOX_TOKEN=<JWT token from previous step>
+//    set NOFRIXION_USER_TOKEN=<JWT token from previous step>
 /// 3. Run the applicatio using:
 //    dotnet run
-// 4. If successful user HTTP status code 200 will be returned.
+// 4. If successful the HTTP status code 200 will be returned.
 //-----------------------------------------------------------------------------
 
-using System.Net.Http;
+using System.Net.Http.Json;
 
 //Remember to keep the JWT token safe and secure.
-var jwtToken = Environment.GetEnvironmentVariable("NOFRIXION_SANDBOX_TOKEN");
+var jwtToken = Environment.GetEnvironmentVariable("NOFRIXION_USER_TOKEN");
+
+string baseUrl = "https://api-sandbox.nofrixion.com/api/v1/payouts";
 
 var client = new HttpClient();
 
-client.DefaultRequestHeaders.Add("Accept", "text/plain");
+client.DefaultRequestHeaders.Add("Accept", "application/json");
 client.DefaultRequestHeaders.Add("Authorization", $"Bearer {jwtToken}");
 
-string url = "https://api-sandbox.nofrixion.com/api/v1/payouts";
 
 // need to specify payout Id
-string payoutId = "68a8abb6-3912-469e-685a-08d9eb7203ba";
+string payoutId = "d6ce03c7-d850-43f1-1cfe-08d9eb8a1950";
 
-HttpResponseMessage response = await client.DeleteAsync($"{url}/{payoutId}");
+HttpResponseMessage response = await client.DeleteAsync($"{baseUrl}/{payoutId}");
+if (response.IsSuccessStatusCode)
+{
+    // HTTP status code OK on success
+    Console.WriteLine(response.StatusCode);
+}
+else
+{
+    // HTTP error codes will return a MoneyMoov API problem object
+    Console.WriteLine(await response.Content.ReadFromJsonAsync<ApiProblem>());
+}
 
-// HTTP status code 200 on success
-Console.WriteLine(response.StatusCode);
+record ApiProblem(string type, string title, int status, string detail);

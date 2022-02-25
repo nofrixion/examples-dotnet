@@ -14,6 +14,7 @@
 //    using the user/settings GET method).
 //-----------------------------------------------------------------------------
 
+using System.Net.Http.Json;
 using System.Text;
 
 const string baseUrl = "https://api-sandbox.nofrixion.com/api/v1/user/settings";
@@ -34,13 +35,23 @@ var data = new StringContent($"userSettings[0].Name={settingName}&userSettings[0
 try
 {
     var response = await client.PostAsync(baseUrl, data);
-    response.EnsureSuccessStatusCode();
 
-    // Status "OK" on success
-    Console.WriteLine(response.StatusCode);
+    if (response.IsSuccessStatusCode)
+    {
+        // Status "OK" on success
+        Console.WriteLine(response.StatusCode);
+    }
+    else
+    {
+        // HTTP error codes will return a MoneyMoov API problem object
+        Console.WriteLine(await response.Content.ReadFromJsonAsync<ApiProblem>());
+    }
+
 }
 catch (Exception e)
 {
     Console.WriteLine($"Error: {e.Message}");
 }
 
+// Type definition for returned data
+record ApiProblem(string type, string title, int status, string detail);

@@ -24,13 +24,19 @@ client.DefaultRequestHeaders.Add("Authorization", $"Bearer {jwtToken}");
 try
 {
     var response = await client.GetAsync(url);
-    response.EnsureSuccessStatusCode();
-
-    // returns user profile object
-    var user = await response.Content.ReadFromJsonAsync<UserProfile>();
-    if (user != null)
+    if (response.IsSuccessStatusCode)
     {
-        Console.WriteLine(user);
+        // returns user profile object
+        var user = await response.Content.ReadFromJsonAsync<UserProfile>();
+        if (user != null)
+        {
+            Console.WriteLine(user);
+        }
+    }
+    else
+    {
+        // HTTP error codes will return a MoneyMoov API problem object
+        Console.WriteLine(await response.Content.ReadFromJsonAsync<ApiProblem>());
     }
 }
 catch (Exception e)
@@ -38,5 +44,6 @@ catch (Exception e)
     Console.WriteLine($"Error: {e.Message}");
 }
 
-// Type declarations for returned data
+// Type definitions for returned data
 record UserProfile(string id, string firstName, string lastName, string emailAddress);
+record ApiProblem(string type, string title, int status, string detail);

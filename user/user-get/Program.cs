@@ -27,17 +27,16 @@ client.DefaultRequestHeaders.Add("Authorization", $"Bearer {jwtToken}");
 try
 {
     var response = await client.GetAsync(baseUrl);
-    response.EnsureSuccessStatusCode();
-
-    var userProfile = await response.Content.ReadFromJsonAsync<UserProfile>();
-    if (userProfile != null)
+    if (response.IsSuccessStatusCode)
     {
+        var userProfile = await response.Content.ReadFromJsonAsync<UserProfile>();
         // View contents of user profile, can also access as userProfile.firstName etc.
         Console.WriteLine(userProfile);
     }
     else
     {
-        Console.WriteLine("No user profile found.");
+        // HTTP error codes will return a MoneyMoov API problem object
+        Console.WriteLine(await response.Content.ReadFromJsonAsync<ApiProblem>());
     }
 }
 catch (Exception e)
@@ -45,6 +44,7 @@ catch (Exception e)
     Console.WriteLine($"Error: {e.Message}");
 }
 
-
-// Type declarations for returned data
+// Type definitions for returned data
 record UserProfile(string firstName, string lastName, string emailAddress);
+
+record ApiProblem(string type, string title, int status, string detail);
