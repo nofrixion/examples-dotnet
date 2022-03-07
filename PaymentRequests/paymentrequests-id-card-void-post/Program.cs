@@ -1,6 +1,7 @@
 //-----------------------------------------------------------------------------
-// Description: Example of calling the NoFrixion MoneyMoov API paymentrequests/{id}/result 
-// GET method. It returns the result from the processing of a payment request.
+// Description: Example of calling the NoFrixion MoneyMoov API 
+// paymentrequests/{id}/card/void POST method. It voids a recently  
+// processed card payment, authorisation or capture.
 //
 // Usage:
 // 1. Create a MERCHANT access token in the sandbox portal at:
@@ -9,10 +10,12 @@
 //    set NOFRIXION_MERCHANT_TOKEN=<JWT token from previous step>
 /// 3. Run the applicatio using:
 //    dotnet run
-// 4. If successful the JSON object containing the payment request result data will be displayed.
+// 4. If successful JSON object containing the card payment respone
+//    model will be displayed
 //-----------------------------------------------------------------------------
 
 using System.Net.Http.Json;
+using System.Text;
 
 const string baseUrl = "https://api-sandbox.nofrixion.com/api/v1/paymentrequests";
 
@@ -24,15 +27,17 @@ var client = new HttpClient();
 client.DefaultRequestHeaders.Add("Accept", "application/json");
 client.DefaultRequestHeaders.Add("Authorization", $"Bearer {jwtToken}");
 
-string paymentRequestID = "b2d3c9b2-e5f0-4074-988b-08d9f65a6611";
+
+// Specify the payment request ID
+string paymentRequestID = "e111f205-e966-4f2f-988a-08d9f65a6611";
 
 try
 {
-    HttpResponseMessage response = await client.GetAsync($"{baseUrl}/{paymentRequestID}/result");
+    HttpResponseMessage response = await client.PostAsync($"{baseUrl}/{paymentRequestID}/card/void", null);
     if (response.IsSuccessStatusCode)
     {
-        // JSON object containing payment request result
-        Console.WriteLine(await response.Content.ReadFromJsonAsync<PaymentRequestResult>());
+        // The card payment response model will be returned in JSON object.
+        Console.WriteLine(await response.Content.ReadFromJsonAsync<CardResponse>());
     }
     else
     {
@@ -45,9 +50,11 @@ catch (Exception e)
     Console.WriteLine($"Error: {e.Message}");
 }
 
-// type definition for response data
-record PaymentRequestResult(string paymentRequestID, string requestID, string transactionID, decimal amount, string currency,
-                string result, string status, string errorReason, string errorMessage, string cardTokenCustomerID,
-                string cardAuthorizationResponseID);
+// type definitions for response data
+record CardResponse(string authorizedAmount, string currencyCode, string responseCode, string status,
+                string requestID, string transactionID, CardError error, string payerAuthenticationUrl,
+                string payerAuthenticationAccessToken, int payerAuthenticationWindowWidth,
+                int payerAuthenticationWindowHeight );
 
+record CardError(int errorCode, string id, string message, string reason, string status, string[] details, string rawResponse);
 record ApiProblem(string type, string title, int status, string detail);

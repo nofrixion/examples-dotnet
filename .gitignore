@@ -6,7 +6,7 @@
 # other stuff we don't need - JB
 launch.json
 tasks.json
-*-id-card-*
+PaymentRequests/paymentrequests-id-card-post/
 payouts-submit-id/
 
 # User-specific files
