@@ -13,6 +13,7 @@
 //-----------------------------------------------------------------------------
 
 using System.Net.Http.Json;
+using System.Text.Json;
 
 const string baseUrl = "https://api-sandbox.nofrixion.com/api/v1/paymentrequests";
 
@@ -31,8 +32,14 @@ try
     HttpResponseMessage response = await client.GetAsync($"{baseUrl}/{paymentRequestID}/result");
     if (response.IsSuccessStatusCode)
     {
-        // JSON object containing payment request result
-        Console.WriteLine(await response.Content.ReadFromJsonAsync<PaymentRequestResult>());
+        // JSON object containing payment request results
+        var result = await response.Content.ReadFromJsonAsync<PaymentRequestResult>();
+        if (result != null)
+        {
+            // do something with the result object
+            var resultString = JsonSerializer.Serialize<PaymentRequestResult>(result);
+            Console.WriteLine(resultString);
+        }
     }
     else
     {
@@ -46,8 +53,10 @@ catch (Exception e)
 }
 
 // type definition for response data
-record PaymentRequestResult(string paymentRequestID, string requestID, string transactionID, decimal amount, string currency,
-                string result, string status, string errorReason, string errorMessage, string cardTokenCustomerID,
-                string cardAuthorizationResponseID);
+record PaymentRequestPayment(string paymentRequestID, string occuredAt, string paymentMethod, decimal amount,
+                string currency, string cardTokenCustomerID, string cardTransactionID, string cardAuthorizationID,
+                decimal cardCaptureAmount, bool cardIsVoided);
+record PaymentRequestResult(string paymentRequestID, decimal amount, string currency,
+                string result, List<PaymentRequestPayment> payments);
 
 record ApiProblem(string type, string title, int status, string detail);
