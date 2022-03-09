@@ -15,7 +15,6 @@
 //-----------------------------------------------------------------------------
 
 using System.Net.Http.Json;
-using System.Text;
 
 const string baseUrl = "https://api-sandbox.nofrixion.com/api/v1/paymentrequests";
 
@@ -29,14 +28,15 @@ client.DefaultRequestHeaders.Add("Authorization", $"Bearer {jwtToken}");
 
 
 // Specify the payment request ID and amount to be captured from the card.
-string paymentRequestID = "e111f205-e966-4f2f-988a-08d9f65a6611";
-string paymentAmount = "0.50";
+string paymentRequestID = "c97e3530-812f-45b8-11fc-08d9f4f51c4a";
 
-var postData = new StringContent($"amount={paymentAmount}", Encoding.UTF8, "application/x-www-form-urlencoded");
+var postData = new Dictionary<string, string>();
+postData.Add("authorizationID", "6466228348276095704003");
+postData.Add("paymentAmount", "0.10");
 
 try
 {
-    HttpResponseMessage response = await client.PostAsync($"{baseUrl}/{paymentRequestID}/card/capture", postData);
+    HttpResponseMessage response = await client.PostAsync($"{baseUrl}/{paymentRequestID}/card/capture", new FormUrlEncodedContent(postData));
     if (response.IsSuccessStatusCode)
     {
         // The card payment response model will be returned in JSON object.
