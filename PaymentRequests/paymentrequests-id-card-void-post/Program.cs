@@ -29,11 +29,16 @@ client.DefaultRequestHeaders.Add("Authorization", $"Bearer {jwtToken}");
 
 
 // Specify the payment request ID
-string paymentRequestID = "e111f205-e966-4f2f-988a-08d9f65a6611";
+string paymentRequestID = "b2d3c9b2-e5f0-4074-988b-08d9f65a6611";
+
+// neet to include authorizationID of transaction to void in request body
+string authorizationID = "6466287753656513704004";
+
+var postData = new StringContent($"authorizationID={authorizationID}", Encoding.UTF8, "application/x-www-form-urlencoded");
 
 try
 {
-    HttpResponseMessage response = await client.PostAsync($"{baseUrl}/{paymentRequestID}/card/void", null);
+    HttpResponseMessage response = await client.PostAsync($"{baseUrl}/{paymentRequestID}/card/void", postData);
     if (response.IsSuccessStatusCode)
     {
         // The card payment response model will be returned in JSON object.
