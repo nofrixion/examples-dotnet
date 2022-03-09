@@ -27,12 +27,13 @@ client.DefaultRequestHeaders.Add("Accept", "application/json");
 client.DefaultRequestHeaders.Add("Authorization", $"Bearer {jwtToken}");
 
 
-// Specify the payment request ID and amount to be captured from the card.
-string paymentRequestID = "c97e3530-812f-45b8-11fc-08d9f4f51c4a";
+// Specify the payment request ID (URL param)
+string paymentRequestID = "187ec02c-860f-4414-ccb5-08da00f4d66d";
 
+// Specify the authorizationID and amount to be captured from the card in the request body.
 var postData = new Dictionary<string, string>();
-postData.Add("authorizationID", "6466228348276095704003");
-postData.Add("paymentAmount", "0.10");
+postData.Add("authorizationID", "6467848603196559404005");
+postData.Add("amount", "0.10");
 
 try
 {
