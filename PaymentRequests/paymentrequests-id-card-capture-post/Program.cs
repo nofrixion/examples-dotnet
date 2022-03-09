@@ -32,8 +32,8 @@ string paymentRequestID = "187ec02c-860f-4414-ccb5-08da00f4d66d";
 
 // Specify the authorizationID and amount to be captured from the card in the request body.
 var postData = new Dictionary<string, string>();
-postData.Add("authorizationID", "6467848603196559404005");
-postData.Add("amount", "0.10");
+postData.Add("AuthorizationID", "6467848603196559404005");
+postData.Add("Amount", "0.10");
 
 try
 {
