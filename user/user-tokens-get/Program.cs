@@ -29,10 +29,10 @@ try
     var response = await client.GetAsync(baseUrl);
     if (response.IsSuccessStatusCode)
     {
-        var userTokens = await response.Content.ReadFromJsonAsync<List<UserToken>>();
-        if (userTokens != null)
+        var userTokens = await response.Content.ReadFromJsonAsync<UserTokensPage>();
+        if (userTokens != null && userTokens.content != null)
         {
-            foreach (var token in userTokens)
+            foreach (var token in userTokens.content)
             {
                 // Display token information
                 Console.WriteLine(token);
@@ -59,4 +59,5 @@ catch (Exception e)
 record UserToken(string id, string userID, string type, string description, string accessTokenHash,
             string refreshTokenHash, string inserted, string lastUpdated, string approveTokenUrl);
 
+record UserTokensPage(List<UserToken> content, int pageNumber, int pageSize, int totalPages, int totalSize);
 record ApiProblem(string type, string title, int status, string detail);
