@@ -9,7 +9,7 @@
 //    set NOFRIXION_USER_TOKEN=<JWT token from previous step>
 // 3. Run the applicatio using:
 //    dotnet run
-// 4. If successful the updated details of the specified user access token will be displayed.
+// 4. If successful the updated details of the updated user access token will be displayed.
 //-----------------------------------------------------------------------------
 
 using System.Net.Http.Json;
