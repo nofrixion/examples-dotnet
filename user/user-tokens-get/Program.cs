@@ -17,7 +17,7 @@ using System.Net.Http.Json;
 
 const string baseUrl = "https://api-sandbox.nofrixion.com/api/v1/user/tokens";
 
-// Note optional url paramaters for paging the payout list are exposed in the API
+// Note optional url paramaters for paging the token list are exposed in the API
 // - see https://api-sandbox.nofrixion.com/swagger/index.html for full details
 
 var jwtToken = Environment.GetEnvironmentVariable("NOFRIXION_USER_TOKEN");
