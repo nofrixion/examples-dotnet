@@ -1,7 +1,6 @@
 ﻿//-----------------------------------------------------------------------------
 // Description: Example of calling the NoFrixion MoneyMoov API user/tokens/{id} 
-// PUT method. It provides a convenient way to update information about  
-// the specified access token.
+// PUT method. It provides a convenient way to update a user access token's description.
 //
 // Usage:
 // 1. Create a user access token in the sandbox portal at:
@@ -19,17 +18,16 @@ const string baseUrl = "https://api-sandbox.nofrixion.com/api/v1/user/tokens";
 
 var jwtToken = Environment.GetEnvironmentVariable("NOFRIXION_USER_TOKEN");
 
-string tokenID = "cf0ceff0-443c-4420-9b49-e8f28715a2a2";
+string tokenID = "042a5ab9-3f36-4d6e-a7c8-fcdc901c7e2d";
 
 var client = new HttpClient();
 
 client.DefaultRequestHeaders.Add("Accept", "application/json");
 client.DefaultRequestHeaders.Add("Authorization", $"Bearer {jwtToken}");
 
+// Currently only the token description can be updated.
 var uptdatedToken = new Dictionary<string, string>();
-uptdatedToken.Add("UserID", "b9300b17-d00f-43d0-baec-c571a0d4350c");
-uptdatedToken.Add("Type", "ApiToken");
-uptdatedToken.Add("Description", $"Update {DateTime.UtcNow.ToString()}");
+uptdatedToken.Add("Description", $"Updated on {DateTime.UtcNow.ToString()}");
 
 HttpContent putData = new FormUrlEncodedContent(uptdatedToken);
 
