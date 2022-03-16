@@ -26,6 +26,7 @@ client.DefaultRequestHeaders.Add("Authorization", $"Bearer {jwtToken}");
 
 try
 {
+    // Note the page nummber and number of tokens per page can be passed as a query parameter
     var response = await client.GetAsync(baseUrl);
     if (response.IsSuccessStatusCode)
     {
