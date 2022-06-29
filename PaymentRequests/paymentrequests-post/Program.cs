@@ -31,20 +31,21 @@ paymentRequest.Add("Amount", "0.99");
 paymentRequest.Add("Currency", "EUR");
 paymentRequest.Add("CustomerID", "C202202024158");
 paymentRequest.Add("OrderID", "Sample order");
+paymentRequest.Add("PaymentMethodTypes", "card");
 // The methods below allow the purchaser to choose from those listed - BTC lightning payments coming soon!
-paymentRequest.Add("PaymentMethodTypes", "card,pisp");
+//paymentRequest.Add("PaymentMethodTypes", "card,pisp,lightning");
 paymentRequest.Add("Description", "API Payment request");
 // URLs to integrate with merchant's site (required for card payments)
 paymentRequest.Add("OriginUrl", "https://some.origin.url");
 paymentRequest.Add("CallbackUrl", "https://some.callback.url");
 // PISP specific fields
-paymentRequest.Add("PispAccountID", "A120P0JR");
-paymentRequest.Add("PispRecipientReference", "Recipient ref");
-// Card specific fields
-paymentRequest.Add("CardAuthorizeOnly", "true");
-paymentRequest.Add("CardCreateToken", "false");
-paymentRequest.Add("IgnoreAddressVerification", "true");
-paymentRequest.Add("CardIgnoreCVN", "true");
+//paymentRequest.Add("PispAccountID", "A120P0JR");
+//paymentRequest.Add("PispRecipientReference", "Recipient ref");
+// Optional Card specific fields
+// paymentRequest.Add("CardAuthorizeOnly", "true");
+// paymentRequest.Add("CardCreateToken", "false");
+// paymentRequest.Add("IgnoreAddressVerification", "true");
+// paymentRequest.Add("CardIgnoreCVN", "true");
 // Shipping and billing address data can also be included in the payment request
 // => see https://api-sandbox.nofrixion.com/swagger/index.html for a complete reference.
 
