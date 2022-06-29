@@ -30,7 +30,8 @@ paymentRequest.Add("MerchantID", "AB4476A1-8364-4D13-91CE-F4C4CA4EE6BE");
 paymentRequest.Add("Amount", "0.99");
 paymentRequest.Add("Currency", "EUR");
 paymentRequest.Add("CustomerID", "C202202024158");
-paymentRequest.Add("OrderID", "Sample order");
+// If set the OrderID must be unique.
+//paymentRequest.Add("OrderID", "abc1234");
 paymentRequest.Add("PaymentMethodTypes", "card");
 // The methods below allow the purchaser to choose from those listed - BTC lightning payments coming soon!
 //paymentRequest.Add("PaymentMethodTypes", "card,pisp,lightning");
